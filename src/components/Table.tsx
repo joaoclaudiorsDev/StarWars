@@ -1,4 +1,6 @@
-function Table({ planets }) {
+import { Planet } from './types';
+
+function Table({ planets }: { planets: Planet[] }) {
   if (planets.length === 0) {
     return <p>Loading...</p>;
   }
@@ -18,7 +20,7 @@ function Table({ planets }) {
         {planets.map((planet) => (
           <tr key={ planet.name }>
             {headers.map((header) => (
-              <td key={ header }>{planet[header]}</td>
+              <td key={ header }>{planet[header as keyof Planet]}</td>
             ))}
           </tr>
         ))}

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import Table from './Table';
+import { Planet } from './types';
 
 function PlanetsApi() {
-  const [planets, setPlanets] = useState([]);
+  const [planets, setPlanets] = useState<Planet[]>([]);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets/')
       .then((response) => response.json())
       .then((data) => {
-        const processedPlanets = data.results.map((planet) => {
+        const processedPlanets = data.results.map((planet: Planet) => {
           const { residents, ...planetData } = planet;
           return planetData;
         });
