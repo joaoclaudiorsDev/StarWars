@@ -1,11 +1,14 @@
 import { Planet } from './types';
+import { usePlanetContext } from './PlanetContext';
 
 function Table({ planets }: { planets: Planet[] }) {
+  const { filteredPlanets } = usePlanetContext();
+
   if (planets.length === 0) {
     return <p>Loading...</p>;
   }
 
-  const headers = Object.keys(planets[0]).filter((key) => key !== 'residents');
+  const headers = Object.keys(filteredPlanets[0]).filter((key) => key !== 'residents');
 
   return (
     <table>
