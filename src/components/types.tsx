@@ -12,4 +12,14 @@ export type PlanetContextType = {
   filteredPlanets: Planet[];
   setSearchTerm: Dispatch<SetStateAction<string>>;
   updateFilteredPlanets: (allPlanets: Planet[]) => void;
+  filters: Filter;
+  setFilters: Dispatch<SetStateAction<Filter>>;
 };
+
+export type Filter = {
+  column: string;
+  comparison: string;
+  value: string;
+};
+
+export type ColumnType = keyof Planet;
