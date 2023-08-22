@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Table from './Table';
-import { NumericFilter, Planet } from './types';
+import { NumericFilter, Planet, ValidColumn } from './types';
 import { usePlanetContext } from './Contexts/PlanetContext';
 import { useFilterContext } from './Contexts/FilterContext';
-
-type ValidColumn = keyof Planet;
 
 function PlanetsApi() {
   const [planets, setPlanets] = useState<Planet[]>([]);
   const { filteredPlanets, setSearchTerm, updateFilteredPlanets } = usePlanetContext();
   const { filters, addFilter } = useFilterContext();
+  const [activeFilters, setActiveFilters] = useState<NumericFilter[]>([]);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets/')
@@ -33,22 +32,29 @@ function PlanetsApi() {
       return;
     }
 
-    const numericFilter: NumericFilter = {
+    const newFilter: NumericFilter = {
       column: selectedColumn,
       comparison: selectedComparison,
       value: selectedValue as number,
     };
 
-    addFilter(numericFilter);
+    const updatedFilters = [...activeFilters, newFilter];
+    setActiveFilters(updatedFilters);
 
     const filtered = planets.filter((planet) => {
-      const planetValue = parseFloat(planet[selectedColumn] as string);
-      if (selectedComparison === 'maior que') {
-        return planetValue > selectedValue;
-      } if (selectedComparison === 'menor que') {
-        return planetValue < selectedValue;
-      }
-      return planetValue === selectedValue;
+      return updatedFilters.every((filter) => {
+        const planetValue = parseFloat(planet[filter.column as keyof Planet]);
+        switch (filter.comparison) {
+          case 'maior que':
+            return planetValue > filter.value;
+          case 'menor que':
+            return planetValue < filter.value;
+          case 'igual a':
+            return planetValue === filter.value;
+          default:
+            return true;
+        }
+      });
     });
 
     updateFilteredPlanets(filtered);

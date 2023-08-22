@@ -15,6 +15,7 @@ export type PlanetContextType = {
 };
 
 export type Filter = {
+  column: ValidColumn;
   name: string;
   value: string;
 };
@@ -36,3 +37,5 @@ export type FilterContextValue = {
   addFilter: (filter: NumericFilter) => void;
   removeFilter: (name: string) => void;
 };
+
+export type ValidColumn = keyof Planet;
