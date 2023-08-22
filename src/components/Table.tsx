@@ -1,5 +1,5 @@
 import { Planet } from './types';
-import { usePlanetContext } from './PlanetContext';
+import { usePlanetContext } from './Contexts/PlanetContext';
 
 function Table({ planets }: { planets: Planet[] }) {
   const { filteredPlanets } = usePlanetContext();

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { PlanetContextType } from './types';
+import { PlanetContextType } from '../types';
 
 const PlanetContext = createContext<PlanetContextType>({
   filteredPlanets: [],
