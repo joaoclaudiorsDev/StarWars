@@ -157,7 +157,7 @@ function PlanetsApi() {
       <button data-testid="button-filter" onClick={ handleFilterClick }>
         Filter
       </button>
-      <Table planets={ filteredPlanets } />
+      <Table data-testid="planets-table" planets={ filteredPlanets } />
     </div>
   );
 }
