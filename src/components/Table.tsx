@@ -9,7 +9,7 @@ function Table({ planets }: { planets: Planet[] }) {
   }
 
   const headers = Object.keys(filteredPlanets[0]).filter((key) => key !== 'residents');
-
+  console.log(headers);
   return (
     <table>
       <thead>

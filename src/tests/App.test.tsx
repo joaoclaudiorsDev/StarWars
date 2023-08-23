@@ -2,6 +2,8 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import PlanetsApiWithProvider from '../components/PlanetsApiWithProvider';
 import PlanetsApi from '../components/PlanetsApi';
+import { APIResult } from './mock';
+import Table from '../components/Table';
 
 test('renders PlanetsApiWithProvider component', () => {
   const { getByText } = render(<PlanetsApiWithProvider />);
@@ -18,7 +20,6 @@ test('renders all data-testid elements in PlanetsApi', () => {
   const comparisonFilterElement = getByTestId('comparison-filter');
   const valueFilterElement = getByTestId('value-filter');
   const buttonFilterElement = getByTestId('button-filter');
-  
   expect(nameFilterElement).toBeInTheDocument();
   expect(columnFilterElement).toBeInTheDocument();
   expect(comparisonFilterElement).toBeInTheDocument();
@@ -28,7 +29,6 @@ test('renders all data-testid elements in PlanetsApi', () => {
 
 test('verifies that numeric filter starts with 0', () => {
   const { getByTestId } = render(<PlanetsApi />);
-  
   const selectElement = getByTestId('column-filter');
   const comparisonElement = getByTestId('comparison-filter');
   const valueElement = getByTestId('value-filter');
@@ -39,4 +39,10 @@ test('verifies that numeric filter starts with 0', () => {
   
   const numericValue = 0;
   expect(valueElement).toHaveValue(numericValue);
+});
+
+
+test('should render loading message when no planets are provided', () => {
+    const { getByText } = render(<Table planets={[]} />);
+    expect(getByText('Loading...')).toBeInTheDocument();
 });

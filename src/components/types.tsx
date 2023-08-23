@@ -15,21 +15,23 @@ export type PlanetContextType = {
 };
 
 export type Filter = {
-  column: ValidColumn;
+  column: string;
+  comparison: string;
+  value: string | number;
   name: string;
-  value: string;
-};
-
-export type FilterContextType = {
-  filters: Filter[];
-  addFilter: (filter: Filter) => void;
-  removeFilter: (name: string) => void;
 };
 
 export type NumericFilter = {
-  column: string;
+  column: ValidColumn;
   comparison: string;
   value: number;
+};
+
+export type FilterContextType = {
+  filters: NumericFilter[];
+  availableColumns: string[];
+  addFilter: (filter: NumericFilter) => void;
+  removeFilter: (name: string) => void;
 };
 
 export type FilterContextValue = {

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Table from './Table';
-import { NumericFilter, Planet, ValidColumn } from './types';
+import { Filter, NumericFilter, Planet, ValidColumn } from './types';
 import { usePlanetContext } from './Contexts/PlanetContext';
 import { useFilterContext } from './Contexts/FilterContext';
 
 function PlanetsApi() {
   const [planets, setPlanets] = useState<Planet[]>([]);
   const { filteredPlanets, setSearchTerm, updateFilteredPlanets } = usePlanetContext();
-  const { filters, addFilter } = useFilterContext();
+  const { filters, availableColumns, addFilter } = useFilterContext();
   const [activeFilters, setActiveFilters] = useState<NumericFilter[]>([]);
+  const [selectedColumn, setSelectedColumn] = useState<ValidColumn>('population');
+  const [selectedComparison, setSelectedComparison] = useState<string>('maior que');
+  const [selectedValue, setSelectedValue] = useState<number | ''>(0);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets/')
@@ -22,10 +25,6 @@ function PlanetsApi() {
       });
   }, [updateFilteredPlanets]);
 
-  const [selectedColumn, setSelectedColumn] = useState<ValidColumn>('population');
-  const [selectedComparison, setSelectedComparison] = useState<string>('maior que');
-  const [selectedValue, setSelectedValue] = useState<number | ''>(0);
-
   const handleFilterClick = () => {
     if (!selectedColumn || !selectedComparison || selectedValue === '') {
       console.error('Invalid filter values');
@@ -33,10 +32,16 @@ function PlanetsApi() {
     }
 
     const newFilter: NumericFilter = {
-      column: selectedColumn,
+      column: selectedColumn as ValidColumn,
       comparison: selectedComparison,
       value: selectedValue as number,
     };
+
+    addFilter(newFilter);
+
+    setSelectedColumn('population');
+    setSelectedComparison('maior que');
+    setSelectedValue(0);
 
     const updatedFilters = [...activeFilters, newFilter];
     setActiveFilters(updatedFilters);
@@ -78,11 +83,11 @@ function PlanetsApi() {
         value={ selectedColumn }
         onChange={ (e) => setSelectedColumn(e.target.value as ValidColumn) }
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {availableColumns.map((column : any) => (
+          <option key={ column } value={ column }>
+            {column}
+          </option>
+        ))}
       </select>
       <select
         data-testid="comparison-filter"
@@ -99,10 +104,7 @@ function PlanetsApi() {
         value={ selectedValue }
         onChange={ (e) => setSelectedValue(parseFloat(e.target.value)) }
       />
-      <button
-        data-testid="button-filter"
-        onClick={ handleFilterClick }
-      >
+      <button data-testid="button-filter" onClick={ handleFilterClick }>
         Filter
       </button>
       <Table planets={ filteredPlanets } />
