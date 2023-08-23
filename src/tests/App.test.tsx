@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, within } from '@testing-library/react';
+import { fireEvent, render, waitFor, within } from '@testing-library/react';
 import PlanetsApiWithProvider from '../components/PlanetsApiWithProvider';
 import PlanetsApi from '../components/PlanetsApi';
 import Table from '../components/Table';
@@ -9,6 +9,7 @@ import { APIResult } from './ApiResult';
 import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { g } from 'vitest/dist/types-e3c9754d';
+
 
 describe('PlanetsApiWithProvider component', () => {
   it('renders header with correct title', () => {
@@ -93,6 +94,17 @@ describe('PlanetsApiWithProvider component', () => {
 
     expect(queryByTestId('filter')).toBeNull();
   });
+  
+  it('should fetch and render the list of planets', async () => {
+    render(<PlanetsApi />);
+
+    await waitFor(() => {
+      const planetsTable = document.querySelector('[data-testid="planets-table"]');
+      expect(planetsTable).toBeInTheDocument();
+
+      const planetName = document.querySelector(':scope [data-testid="column-name"]');
+      expect(planetName).toHaveTextContent('Tatooine');
+    });
 
 });
 
