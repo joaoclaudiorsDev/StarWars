@@ -1,6 +1,15 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 
 export type Planet = {
+  rotation_period: ReactNode;
+  orbital_period: ReactNode;
+  diameter: ReactNode;
+  gravity: ReactNode;
+  surface_water: ReactNode;
+  films: ReactNode;
+  created: ReactNode;
+  edited: ReactNode;
+  url: ReactNode;
   name: string;
   climate: string;
   terrain: string;
