@@ -7,7 +7,7 @@ import { useFilterContext } from './Contexts/FilterContext';
 function PlanetsApi() {
   const [planets, setPlanets] = useState<Planet[]>([]);
   const { filteredPlanets, setSearchTerm, updateFilteredPlanets } = usePlanetContext();
-  const { filters, availableColumns, addFilter } = useFilterContext();
+  const { filters, availableColumns, addFilter, removeFilter } = useFilterContext();
   const [activeFilters, setActiveFilters] = useState<NumericFilter[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<ValidColumn>('population');
   const [selectedComparison, setSelectedComparison] = useState<string>('maior que');
@@ -65,6 +65,38 @@ function PlanetsApi() {
     updateFilteredPlanets(filtered);
   };
 
+  const handleRemoveFilter = (filterColumn: string) => {
+    removeFilter(filterColumn);
+
+    const updatedActiveFilters = activeFilters
+      .filter((filter) => filter.column !== filterColumn);
+    setActiveFilters(updatedActiveFilters);
+
+    // Aplicar os filtros restantes na lista completa de planetas
+    let filtered = planets;
+    updatedActiveFilters.forEach((filter) => {
+      filtered = filtered.filter((planet) => {
+        const planetValue = parseFloat(planet[filter.column]);
+        switch (filter.comparison) {
+          case 'maior que':
+            return planetValue > filter.value;
+          case 'menor que':
+            return planetValue < filter.value;
+          case 'igual a':
+            return planetValue === filter.value;
+          default:
+            return true;
+        }
+      });
+    });
+
+    updateFilteredPlanets(filtered);
+  };
+  const handleRemoveAllFilters = () => {
+    setActiveFilters([]);
+    updateFilteredPlanets(planets);
+  };
+
   return (
     <div>
       <h1>Star Wars Planets</h1>
@@ -77,13 +109,31 @@ function PlanetsApi() {
           updateFilteredPlanets(planets);
         } }
       />
+      <button data-testid="button-remove-filters" onClick={ handleRemoveAllFilters }>
+        Remove All Filters
+      </button>
+      <div>
+        {activeFilters.map((filter) => (
+          <div key={ filter.column } data-testid="filter">
+            <span data-testid="column">{filter.column}</span>
+            <span data-testid="comparison">{filter.comparison}</span>
+            <span data-testid="value">{filter.value}</span>
+            <button
+              data-testid="button"
+              onClick={ () => handleRemoveFilter(filter.column) }
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
 
       <select
         data-testid="column-filter"
         value={ selectedColumn }
         onChange={ (e) => setSelectedColumn(e.target.value as ValidColumn) }
       >
-        {availableColumns.map((column : any) => (
+        {availableColumns.map((column: any) => (
           <option key={ column } value={ column }>
             {column}
           </option>
