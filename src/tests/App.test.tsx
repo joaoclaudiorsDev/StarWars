@@ -12,56 +12,67 @@ import { g } from 'vitest/dist/types-e3c9754d';
 import App from '../App';
 
 
+const TEST_IDS = {
+  nameFilter: 'name-filter',
+  columnFilter: 'column-filter',
+  comparisonFilter: 'comparison-filter',
+  valueFilter: 'value-filter',
+  buttonFilter: 'button-filter',
+  h1Element: /Star Wars Planets/i,
+  removeAllFiltersButton: 'button-remove-filters',
+  loadingText: 'Loading...',
+};
+
 describe('PlanetsApiWithProvider component', () => {
+  beforeEach(() => {
+    render(
+      <PlanetProvider>
+        <FilterProvider>
+          <PlanetsApiWithProvider />
+        </FilterProvider>
+      </PlanetProvider>
+    );
+  });
+
   it('renders header with correct title', () => {
-    const { getByText } = render(<PlanetsApiWithProvider />);
-    const headerElement = getByText(/Star Wars Planets/i);
+    const headerElement = screen.getByText(TEST_IDS.h1Element);
     expect(headerElement).toBeInTheDocument();
   });
 
   it('renders all data-testid elements in PlanetsApi', () => {
-    const { getByTestId } = render(<PlanetsApi />);
-    const nameFilterElement = getByTestId('name-filter');
-    const columnFilterElement = getByTestId('column-filter');
-    const comparisonFilterElement = getByTestId('comparison-filter');
-    const valueFilterElement = getByTestId('value-filter');
-    const buttonFilterElement = getByTestId('button-filter');
-    const h1Element = screen.getByText(/star wars planets/i);
-    const inputElement = screen.getByPlaceholderText('Filter by name');
-    const removeFiltersButton = screen.getByTestId('button-remove-filters');
-    
-    expect(nameFilterElement).toBeInTheDocument();
-    expect(columnFilterElement).toBeInTheDocument();
-    expect(comparisonFilterElement).toBeInTheDocument();
-    expect(valueFilterElement).toBeInTheDocument();
-    expect(buttonFilterElement).toBeInTheDocument();
-    expect(h1Element).toBeInTheDocument();
-    expect(inputElement).toBeInTheDocument();
-    expect(removeFiltersButton).toBeInTheDocument();
+    const { getByTestId } = screen;
+
+    expect(getByTestId(TEST_IDS.nameFilter)).toBeInTheDocument();
+    expect(getByTestId(TEST_IDS.columnFilter)).toBeInTheDocument();
+    expect(getByTestId(TEST_IDS.comparisonFilter)).toBeInTheDocument();
+    expect(getByTestId(TEST_IDS.valueFilter)).toBeInTheDocument();
+    expect(getByTestId(TEST_IDS.buttonFilter)).toBeInTheDocument();
+    expect(screen.getByText(TEST_IDS.h1Element)).toBeInTheDocument();
+    expect(screen.getByTestId(TEST_IDS.removeAllFiltersButton)).toBeInTheDocument();
   });
 
   it('verifies that numeric filter starts with 0', () => {
-    const { getByTestId } = render(<PlanetsApi />);
-    const selectElement = getByTestId('column-filter');
-    const comparisonElement = getByTestId('comparison-filter');
-    const valueElement = getByTestId('value-filter');
+    const { getByTestId } = screen;
 
-    fireEvent.change(selectElement, { target: { value: 'population' } });
-    fireEvent.change(comparisonElement, { target: { value: 'maior que' } });
-
-    const numericValue = 0;
-    expect(valueElement).toHaveValue(numericValue);
+    userEvent.selectOptions(getByTestId(TEST_IDS.columnFilter), 'population');
+    userEvent.selectOptions(getByTestId(TEST_IDS.comparisonFilter), 'maior que');
+    expect(getByTestId(TEST_IDS.valueFilter)).toHaveValue(0);
   });
 
-  it('should remove all filters when remove all filters button is clicked', () => {
-    const { getByTestId, queryByTestId } = render(<PlanetsApiWithProvider />);
-    const removeAllFiltersButton = getByTestId('button-remove-filters');
+  it('should remove all filters when remove all filters button is clicked', async () => {
+    const { getByTestId, queryByTestId } = screen;
 
-    fireEvent.click(removeAllFiltersButton);
+    userEvent.click(getByTestId(TEST_IDS.buttonFilter)); // Add a filter
+    expect(queryByTestId('filter')).toBeInTheDocument();
 
-    expect(queryByTestId('filter')).toBeNull();
+    userEvent.click(getByTestId(TEST_IDS.removeAllFiltersButton));
+
+    await waitFor(() => {
+      expect(queryByTestId('filter')).not.toBeInTheDocument();
+    });
   });
 });
+
 
 describe('Table component', () => {
 
