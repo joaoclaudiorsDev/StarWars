@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Table from './Table';
-import { Filter, NumericFilter, Planet, ValidColumn } from './types';
+import { NumericFilter, Planet, ValidColumn } from './types';
 import { usePlanetContext } from './Contexts/PlanetContext';
 import { useFilterContext } from './Contexts/FilterContext';
 
 function PlanetsApi() {
   const [planets, setPlanets] = useState<Planet[]>([]);
   const { filteredPlanets, setSearchTerm, updateFilteredPlanets } = usePlanetContext();
-  const { filters, availableColumns, addFilter, removeFilter } = useFilterContext();
+  const { availableColumns, addFilter, removeFilter } = useFilterContext();
   const [activeFilters, setActiveFilters] = useState<NumericFilter[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<ValidColumn>('population');
   const [selectedComparison, setSelectedComparison] = useState<string>('maior que');
@@ -48,7 +48,7 @@ function PlanetsApi() {
 
     const filtered = planets.filter((planet) => {
       return updatedFilters.every((filter) => {
-        const planetValue = parseFloat(planet[filter.column as keyof Planet]);
+        const planetValue = parseFloat(planet[filter.column] as string);
         switch (filter.comparison) {
           case 'maior que':
             return planetValue > filter.value;
@@ -72,11 +72,10 @@ function PlanetsApi() {
       .filter((filter) => filter.column !== filterColumn);
     setActiveFilters(updatedActiveFilters);
 
-    // Aplicar os filtros restantes na lista completa de planetas
     let filtered = planets;
     updatedActiveFilters.forEach((filter) => {
       filtered = filtered.filter((planet) => {
-        const planetValue = parseFloat(planet[filter.column]);
+        const planetValue = parseFloat(planet[filter.column] as string);
         switch (filter.comparison) {
           case 'maior que':
             return planetValue > filter.value;
