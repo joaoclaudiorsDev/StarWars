@@ -3,6 +3,7 @@ import Table from './Table';
 import { NumericFilter, Planet, ValidColumn } from './types';
 import { usePlanetContext } from './Contexts/PlanetContext';
 import { useFilterContext } from './Contexts/FilterContext';
+import { fetchData } from './fetch/api';
 
 function PlanetsApi() {
   const [planets, setPlanets] = useState<Planet[]>([]);
@@ -14,15 +15,13 @@ function PlanetsApi() {
   const [selectedValue, setSelectedValue] = useState<number | ''>(0);
 
   useEffect(() => {
-    fetch('https://swapi.dev/api/planets/')
-      .then((response) => response.json())
-      .then((data: { results: Planet[] }) => {
-        setPlanets(data.results);
-        updateFilteredPlanets(data.results);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
+    const fetchDataAndUpdatePlanets = async () => {
+      const fetchedPlanets = await fetchData();
+      setPlanets(fetchedPlanets);
+      updateFilteredPlanets(fetchedPlanets);
+    };
+
+    fetchDataAndUpdatePlanets();
   }, [updateFilteredPlanets]);
 
   const handleFilterClick = () => {
