@@ -1,16 +1,12 @@
 import React from 'react';
-import { fireEvent, render, waitFor, within, screen, renderHook } from '@testing-library/react';
+import { render, waitFor, screen, renderHook } from '@testing-library/react';
 import PlanetsApiWithProvider from '../components/PlanetsApiWithProvider';
-import PlanetsApi from '../components/PlanetsApi';
 import Table from '../components/Table';
 import { PlanetProvider } from '../components/Contexts/PlanetContext';
 import { FilterProvider, useFilterContext } from '../components/Contexts/FilterContext';
 import { APIResult } from './ApiResult';
 import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { g } from 'vitest/dist/types-e3c9754d';
-import App from '../App';
-
 
 const TEST_IDS = {
   nameFilter: 'name-filter',
@@ -184,3 +180,22 @@ describe('FilterContext test', () => {
     expect(result.current.availableColumns).toHaveLength(5);
   });
 });
+
+describe('API test', () => {
+  global.fetch = vi.fn().mockResolvedValue({
+    json: async () => (APIResult),
+  });
+
+  it('Test if API is calling', async () => {
+    render(
+      <PlanetProvider>
+        <FilterProvider>
+          <PlanetsApiWithProvider />
+        </FilterProvider>
+      </PlanetProvider>
+    );
+    waitFor(() => {
+      expect(global.fetch).toBeCalledTimes(1);
+    })
+  });
+})

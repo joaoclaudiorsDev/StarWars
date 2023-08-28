@@ -17,6 +17,7 @@ function PlanetsApi() {
   useEffect(() => {
     const fetchDataAndUpdatePlanets = async () => {
       const fetchedPlanets = await fetchData();
+      console.log('API response:', fetchedPlanets);
       setPlanets(fetchedPlanets);
       updateFilteredPlanets(fetchedPlanets);
     };
