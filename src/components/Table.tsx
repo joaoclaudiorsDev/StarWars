@@ -1,5 +1,4 @@
 import { Planet } from './types';
-import { usePlanetContext } from './Contexts/PlanetContext';
 
 function Table({ planets }: { planets: Planet[] }) {
   if (planets.length === 0) {
@@ -28,7 +27,7 @@ function Table({ planets }: { planets: Planet[] }) {
       <tbody>
         {planets.map((planet) => (
           <tr key={ planet.name }>
-            <td>{planet.name}</td>
+            <td data-testId="planet-name">{planet.name}</td>
             <td>{planet.rotation_period}</td>
             <td>{planet.orbital_period}</td>
             <td>{planet.diameter}</td>

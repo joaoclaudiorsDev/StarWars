@@ -13,6 +13,12 @@ function PlanetsApi() {
   const [selectedColumn, setSelectedColumn] = useState<ValidColumn>('population');
   const [selectedComparison, setSelectedComparison] = useState<string>('maior que');
   const [selectedValue, setSelectedValue] = useState<number | ''>(0);
+  const [sortOrder, setSortOrder] = useState<{
+    column: ValidColumn; sort: 'ASC' | 'DESC'
+  }>({
+    column: 'population',
+    sort: 'ASC',
+  });
 
   useEffect(() => {
     const fetchDataAndUpdatePlanets = async () => {
@@ -63,6 +69,29 @@ function PlanetsApi() {
     });
 
     updateFilteredPlanets(filtered);
+  };
+
+  const handleColumnSort = () => {
+    const sortedPlanets = [...filteredPlanets].sort((planetA, planetB) => {
+      const aValue : any = planetA[sortOrder.column];
+      const bValue: any = planetB[sortOrder.column];
+
+      if (aValue === 'unknown' && bValue !== 'unknown') return 1;
+      if (aValue !== 'unknown' && bValue === 'unknown') return -1;
+
+      if (sortOrder.sort === 'ASC') {
+        if (aValue === 'unknown' || bValue === 'unknown') {
+          return aValue.localeCompare(bValue);
+        }
+        return parseFloat(aValue) - parseFloat(bValue as string);
+      }
+      if (aValue === 'unknown' || bValue === 'unknown') {
+        return bValue.localeCompare(aValue);
+      }
+      return parseFloat(bValue as string) - parseFloat(aValue);
+    });
+
+    updateFilteredPlanets(sortedPlanets);
   };
 
   const handleRemoveFilter = (filterColumn: string) => {
@@ -153,6 +182,51 @@ function PlanetsApi() {
         value={ selectedValue }
         onChange={ (e) => setSelectedValue(parseFloat(e.target.value)) }
       />
+      <select
+        data-testid="column-sort"
+        value={ sortOrder.column }
+        onChange={ (e) => setSortOrder((prevSortOrder) => ({
+          ...prevSortOrder,
+          column: e.target.value as ValidColumn,
+        })) }
+      >
+        {availableColumns.map((column, index) => (
+          <option key={ index } value={ column }>
+            {column}
+          </option>
+        ))}
+      </select>
+
+      <label>
+        <input
+          type="radio"
+          value="ASC"
+          data-testid="column-sort-input-asc"
+          checked={ sortOrder.sort === 'ASC' }
+          onChange={ () => setSortOrder((prevSortOrder) => ({
+            ...prevSortOrder, sort: 'ASC' })) }
+        />
+        Ascendente
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          value="DESC"
+          data-testid="column-sort-input-desc"
+          checked={ sortOrder.sort === 'DESC' }
+          onChange={ () => setSortOrder((prevSortOrder) => ({
+            ...prevSortOrder, sort: 'DESC' })) }
+        />
+        Descendente
+      </label>
+
+      <button
+        data-testid="column-sort-button"
+        onClick={ handleColumnSort }
+      >
+        Ordenar
+      </button>
       <button data-testid="button-filter" onClick={ handleFilterClick }>
         Filter
       </button>
